@@ -1,0 +1,53 @@
+<html>
+
+<body>
+    <button onclick="notifyMe()">Notify me!</button>
+</body>
+<script>
+    var obj = {
+        html: {
+            oldtitle: ''
+        },
+        javascript: {
+            oldtitle: ''
+        },
+        nodejs: {
+            oldtitle: ''
+        }
+    };
+    setInterval(function callnode() {
+        for (let x in obj) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(xhttp.responseText);
+                    if (obj[x].oldtitle != response.title) {
+                        obj[x].oldtitle = response.title;
+                        notifyMe(response);
+                    }
+                }
+            };
+            xhttp.open("GET", "/" + x + "/lite", false);
+            xhttp.send();
+        }
+    }, 10000);
+
+    function notifyMe(item) {
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notification");
+        } else if (Notification.permission === "granted") {
+            var notification = new Notification(item.title);
+            notification.onclick = function (event) {
+                event.preventDefault();
+                window.open(item.link, '_blank');
+            }
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission(function (permission) {
+                if (permission === "granted") {
+                    var notification = new Notification("Hi there!");
+                }
+            });
+        }
+    } </script>
+
+</html>

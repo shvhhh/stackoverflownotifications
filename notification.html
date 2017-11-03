@@ -1,0 +1,127 @@
+<html>
+
+<body>
+    <button onclick="notifyMe()">Notify me!</button>
+</body>
+<script>
+
+    //var questiondiv = document.getElementById('questions');
+    var oldtitle = '';
+    var oldtitles = '';
+    var oldtitleh = '';
+    var oldtitlec = ''
+    setInterval(function callnode() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+
+                var response = JSON.parse(xhttp.responseText);
+                response.items.every((element) => {
+                    if (oldtitle != element.title) {
+                        notifyMe(element);
+                    }
+                    else {
+                        return false;
+                    }
+
+                });
+                oldtitle = response.items[0].title;
+            }
+        };
+
+        xhttp.open("GET", "/nodejs", true);
+        xhttp.send();
+
+        var xhttps = new XMLHttpRequest();
+        xhttps.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var responses = JSON.parse(xhttps.responseText);
+                responses.items.every((element) => {
+                    if (oldtitles != element.title) {
+                        notifyMe(element);
+                    }
+                    else {
+                        return false;
+                    }
+
+                }); oldtitles = responses.items[0].title;
+
+            }
+        };
+        xhttps.open("GET", "/javascript", true);
+        xhttps.send();
+        var xhttph = new XMLHttpRequest();
+
+        xhttph.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var responseh = JSON.parse(xhttph.responseText);
+
+                //questiondiv.innerHTML = '';
+                responseh.items.every((element) => {
+                    if (oldtitleh != element.title) {
+
+                        notifyMe(element);
+                    }
+                    else {
+                        return false;
+                    }
+
+                });
+                oldtitleh = responseh.items[0].title;
+            }
+        };
+        xhttph.open("GET", "/html", true);
+        xhttph.send();
+
+        /* var xhttpc = new XMLHttpRequest();
+        xhttpc.open("GET", "http://127.0.0.1:65500/c", false);
+        //xhttp.setRequestHeader("Content-type", "application/json");
+        xhttpc.send();
+        var responsec = JSON.parse(xhttpc.responseText);
+
+        //questiondiv.innerHTML = '';
+        res
+        if (oldtitlec != responsec.items[0].titles) {
+            oldtitlec = responsec.items[0].titles;
+            notifyMe(responsec.items[0]);
+        } */
+    }, 10000);
+
+    function notifyMe(item) {
+        // Let's check if the browser supports notifications
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notification");
+        }
+
+        // Let's check whether notification permissions have already been granted
+        else if (Notification.permission === "granted") {
+            /* var options = {
+                body: item.tags,
+                icon: item.owner.profile_image
+            } */
+
+            // If it's okay let's create a notification
+            var notification = new Notification(item.title);
+            notification.onclick = function (event) {
+                event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                window.open(item.link, '_blank');
+                //  Notification.close();
+            }
+        }
+
+        // Otherwise, we need to ask the user for permission
+        else if (Notification.permission !== "denied") {
+            Notification.requestPermission(function (permission) {
+                // If the user accepts, let's create a notification
+                if (permission === "granted") {
+                    var notification = new Notification("Hi there!");
+                }
+            });
+        }
+
+        // At last, if the user has denied notifications, and you 
+        // want to be respectful there is no need to bother them any more.
+    }
+</script>
+
+</html>
